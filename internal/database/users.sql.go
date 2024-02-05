@@ -47,3 +47,12 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 	)
 	return i, err
 }
+
+const updateUserLoginTime = `-- name: UpdateUserLoginTime :exec
+UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE username = $1
+`
+
+func (q *Queries) UpdateUserLoginTime(ctx context.Context, username string) error {
+	_, err := q.db.ExecContext(ctx, updateUserLoginTime, username)
+	return err
+}

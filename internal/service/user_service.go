@@ -68,6 +68,9 @@ func (s *UserService) LoginUser(c *gin.Context, user *requestresponse.UserLoginR
 	}
 
 	user_response := requestresponse.NewUserLoginResponseFromUser(&usr, accessToken)
+
+	s.db.UpdateUserLoginTime(c, user.Username)
+
 	return user_response, nil
 }
 
