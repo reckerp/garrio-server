@@ -60,3 +60,8 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 		Username: usr.Username,
 	})
 }
+
+func (h *UserHandler) LogoutUser(c *gin.Context) {
+	c.SetCookie("garrio_jwt", "", -1, "/", os.Getenv("GARRIO_HOST"), false, false)
+	c.JSON(http.StatusOK, gin.H{"message": "user successfully logged out"})
+}

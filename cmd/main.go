@@ -43,6 +43,7 @@ func main() {
 
 	v1Router.POST("/signup", userHandler.CreateUser)
 	v1Router.POST("/login", userHandler.LoginUser)
+	v1Router.GET("/logout", userHandler.LogoutUser)
 
 	// Start the server
 	mainRouter.Run(":" + port)
