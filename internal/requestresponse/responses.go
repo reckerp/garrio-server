@@ -37,3 +37,9 @@ func NewUserLoginResponseFromUser(user *database.User, accessToken string) *User
 
 	return &res
 }
+
+type UserResponse struct {
+	ID       uuid.UUID `json:"id"`
+	Username string    `json:"username"`
+	Message  string    `json:"message"`
+}
