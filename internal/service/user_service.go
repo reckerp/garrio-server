@@ -1,8 +1,8 @@
 package service
 
 import (
+	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/reckerp/garrio-server/internal/database"
 	"github.com/reckerp/garrio-server/internal/requestresponse"
@@ -22,7 +22,10 @@ func NewUserService(db *database.Queries) *UserService {
 	return &UserService{db: db}
 }
 
-func (s *UserService) CreateUser(c *gin.Context, user *requestresponse.UserCreateRequest) (*requestresponse.UserCreatedResponse, error) {
+func (s *UserService) CreateUser(c context.Context, user *requestresponse.UserCreateRequest) (*requestresponse.UserCreatedResponse, error) {
+	ctx, cancel := context.WithTimeout(c, 5*time.Second)
+	defer cancel()
+
 	if user.Username == "" || user.Password == "" {
 		return nil, errors.New("username and password are required")
 	}
@@ -39,7 +42,7 @@ func (s *UserService) CreateUser(c *gin.Context, user *requestresponse.UserCreat
 		return nil, errors.New("error hashing password")
 	}
 
-	usr, err := s.db.CreateUser(c, database.CreateUserParams{
+	usr, err := s.db.CreateUser(ctx, database.CreateUserParams{
 		Username: user.Username,
 		Password: hashedPassword,
 	})
@@ -52,8 +55,11 @@ func (s *UserService) CreateUser(c *gin.Context, user *requestresponse.UserCreat
 	return user_response, nil
 }
 
-func (s *UserService) LoginUser(c *gin.Context, user *requestresponse.UserLoginRequest) (*requestresponse.UserLoginResponse, error) {
-	usr, err := s.db.GetUserByUsername(c, user.Username)
+func (s *UserService) LoginUser(c context.Context, user *requestresponse.UserLoginRequest) (*requestresponse.UserLoginResponse, error) {
+	ctx, cancel := context.WithTimeout(c, 5*time.Second)
+	defer cancel()
+
+	usr, err := s.db.GetUserByUsername(ctx, user.Username)
 	if err != nil {
 		return nil, errors.New("username or password incorrect")
 	}

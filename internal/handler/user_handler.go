@@ -22,7 +22,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	usr, err := h.userService.CreateUser(c, &userRequest)
+	usr, err := h.userService.CreateUser(c.Request.Context(), &userRequest)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -37,7 +37,7 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	usr, err := h.userService.LoginUser(c, &userRequest)
+	usr, err := h.userService.LoginUser(c.Request.Context(), &userRequest)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
