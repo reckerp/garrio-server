@@ -5,10 +5,38 @@
 package database
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type Message struct {
+	ID          uuid.UUID
+	RoomID      uuid.UUID
+	SenderID    uuid.UUID
+	SenderUname string
+	Content     string
+	MessageType int32
+	CreatedAt   sql.NullTime
+}
+
+type Room struct {
+	ID             uuid.UUID
+	Name           string
+	InviteCode     string
+	RecordMessages bool
+	AnonUsers      bool
+	OwnerID        uuid.UUID
+	CreatedAt      sql.NullTime
+}
+
+type RoomMember struct {
+	RoomID    uuid.UUID
+	UserID    uuid.UUID
+	IsAdmin   bool
+	CreatedAt sql.NullTime
+}
 
 type User struct {
 	ID        uuid.UUID

@@ -35,7 +35,10 @@ func main() {
 	queries := database.New(conn)
 
 	userService := service.NewUserService(queries)
+	roomService := service.NewRoomService(queries)
+
 	userHandler := handler.NewUserHandler(userService)
+	roomHandler := handler.NewRoomHandler(roomService)
 
 	mainRouter := gin.Default()
 
@@ -44,6 +47,9 @@ func main() {
 	v1Router.POST("/signup", userHandler.CreateUser)
 	v1Router.POST("/login", userHandler.LoginUser)
 	v1Router.GET("/logout", userHandler.LogoutUser)
+
+	v1Router.POST("/rooms", roomHandler.CreateRoom)
+	v1Router.DELETE("/rooms/:id", roomHandler.DeleteRoom)
 
 	// Start the server
 	mainRouter.Run(":" + port)
