@@ -43,6 +43,27 @@ func (q *Queries) GetRoomMembersByRoomID(ctx context.Context, roomID uuid.UUID) 
 	return items, nil
 }
 
+const isUserMemberOfRoom = `-- name: IsUserMemberOfRoom :one
+SELECT room_id, user_id, is_admin, created_at FROM room_members WHERE room_id = $1 AND user_id = $2
+`
+
+type IsUserMemberOfRoomParams struct {
+	RoomID uuid.UUID
+	UserID uuid.UUID
+}
+
+func (q *Queries) IsUserMemberOfRoom(ctx context.Context, arg IsUserMemberOfRoomParams) (RoomMember, error) {
+	row := q.db.QueryRowContext(ctx, isUserMemberOfRoom, arg.RoomID, arg.UserID)
+	var i RoomMember
+	err := row.Scan(
+		&i.RoomID,
+		&i.UserID,
+		&i.IsAdmin,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const joinRoomByRoomIDAndUserID = `-- name: JoinRoomByRoomIDAndUserID :one
 INSERT INTO room_members (room_id, user_id, is_admin) VALUES ($1, $2, $3) RETURNING room_id, user_id, is_admin, created_at
 `

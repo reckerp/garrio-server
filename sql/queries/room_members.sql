@@ -7,5 +7,8 @@ SELECT * FROM room_members WHERE room_id = $1;
 -- name: RoomMemberCountByRoomID :one
 SELECT COUNT(*) FROM room_members WHERE room_id = $1;
 
+-- name: IsUserMemberOfRoom :one
+SELECT * FROM room_members WHERE room_id = $1 AND user_id = $2;
+
 -- name: LeaveRoomByRoomIDAndUserID :one
 DELETE FROM room_members WHERE room_id = $1 AND user_id = $2 RETURNING *;

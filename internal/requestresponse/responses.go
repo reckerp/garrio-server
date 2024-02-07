@@ -43,3 +43,16 @@ type UserResponse struct {
 	Username string    `json:"username"`
 	Message  string    `json:"message"`
 }
+
+type JoinRoomResponse struct {
+	RoomID         uuid.UUID `json:"room_id"`
+	RecordMessages bool      `json:"record_messages"`
+	ActiveUsers    int       `json:"active_users"`
+}
+
+type RoomMemberResponse struct {
+	RoomID         uuid.UUID `json:"room_id"`
+	RoomName       string    `json:"room_name"`
+	RecordMessages bool      `json:"record_messages"`
+	AllowAnon      bool      `json:"allow_anon"`
+}

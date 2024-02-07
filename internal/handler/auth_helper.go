@@ -3,19 +3,30 @@ package handler
 import (
 	"context"
 	"errors"
-	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"log"
+	"os"
+	"strings"
 )
 
 func autenticateUser(c *gin.Context) (context.Context, error) {
 	cookie, err := c.Request.Cookie("garrio_jwt")
-	if err != nil {
+	bearer := c.GetHeader("Authorization")
+	if err != nil && bearer == "" {
 		return nil, errors.New("unauthorized")
 	}
 
-	tokenString := cookie.Value
+	var tokenString string
+	if bearer == "" {
+		tokenString = cookie.Value
+	} else {
+		tokenString = strings.Split(bearer, " ")[1]
+		tokenString = strings.TrimSpace(tokenString)
+	}
+
+	log.Println("Token:" + tokenString)
+
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("GARRIO_JWT_SECRET")), nil
 	})
@@ -30,5 +41,8 @@ func autenticateUser(c *gin.Context) (context.Context, error) {
 	}
 
 	tokenUserID := token.Claims.(jwt.MapClaims)["id"].(string)
-	return context.WithValue(c.Request.Context(), "userID", tokenUserID), nil
+	tokenUName := token.Claims.(jwt.MapClaims)["username"].(string)
+	ctx := context.WithValue(c.Request.Context(), "uname", tokenUName)
+	ctx = context.WithValue(ctx, "userID", tokenUserID)
+	return ctx, nil
 }
