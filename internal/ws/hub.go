@@ -68,7 +68,8 @@ func (h *Hub) Run() {
 					delete(room.Clients, unregisterClient.UserID)
 					close(unregisterClient.MessageCh)
 					if len(room.Clients) != 0 {
-						msg := NewMessage(room.ID, unregisterClient.UserID, unregisterClient.ActiveUname, unregisterClient.ActiveUname+" left the room.", DISPLAYABLE_SYSTEM_MESSAGE)
+						msg := NewMessage(room.ID, unregisterClient.UserID, unregisterClient.ActiveUname,
+							unregisterClient.ActiveUname+" left the room.", DISPLAYABLE_SYSTEM_MESSAGE)
 						h.BroadcastCh <- msg
 					} else {
 						delete(h.ActiveRooms, unregisterClient.RoomID)
@@ -79,7 +80,9 @@ func (h *Hub) Run() {
 		case msg := <-h.BroadcastCh:
 			if _, ok := h.ActiveRooms[msg.RoomID]; ok {
 				for _, client := range h.ActiveRooms[msg.RoomID].Clients {
-					client.MessageCh <- msg
+					if client.UserID != msg.SenderID || msg.MessageType < 51 {
+						client.MessageCh <- msg
+					}
 				}
 			}
 		}

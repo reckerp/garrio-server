@@ -3,6 +3,7 @@ package handler
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	// "github.com/reckerp/garrio-server/internal/requestresponse"
+	"github.com/reckerp/garrio-server/internal/requestresponse"
 	"github.com/reckerp/garrio-server/internal/service"
 	"github.com/reckerp/garrio-server/internal/ws"
 )
@@ -86,7 +88,27 @@ func (h *ChatHandler) JoinRoom(c *gin.Context) {
 	}
 
 	client := ws.NewClient(conn, room.ID, userId, clientUname)
-	msg := ws.NewMessage(room.ID, userId, clientUname, clientUname+" joined the room.", ws.DISPLAYABLE_SYSTEM_MESSAGE)
+
+	// Send room update message to client
+	roomMemberCount, memberCountErr := h.roomService.RoomMemberCountByRoomID(ctx, &roomID)
+	if memberCountErr != nil {
+		roomMemberCount = -1
+	}
+	activeRoomMemberCount := len(room.Clients)
+	roomUpdateResponse := requestresponse.RoomUpdateResponse{
+		RoomID:          room.ID,
+		Name:            room.Name,
+		RecordMessages:  room.RecordMessages,
+		AllowAnon:       room.AllowAnon,
+		ActiveUserCount: int64(activeRoomMemberCount + 1), // +1 for the new user
+		MemberCount:     roomMemberCount,
+	}
+	jsonRoomUpdateResponse, _ := json.Marshal(roomUpdateResponse)
+	roomUpdateMsg := ws.NewMessage(room.ID, userId, clientUname, string(jsonRoomUpdateResponse), ws.ROOM_UPDATE_MESSAGE)
+	client.MessageCh <- roomUpdateMsg
+
+	// Create a message for the room that the user joined
+	msg := ws.NewMessage(room.ID, userId, clientUname, clientUname+" joined the room.", ws.USER_JOIN_LEAVE_MESSAGE)
 
 	// Register client through register channel
 	h.hub.RegisterCh <- client

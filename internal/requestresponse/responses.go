@@ -56,3 +56,12 @@ type RoomMemberResponse struct {
 	RecordMessages bool      `json:"record_messages"`
 	AllowAnon      bool      `json:"allow_anon"`
 }
+
+type RoomUpdateResponse struct {
+	RoomID          uuid.UUID `json:"room_id"`
+	Name            string    `json:"name"`
+	RecordMessages  bool      `json:"record_messages"`
+	AllowAnon       bool      `json:"allow_anon"`
+	ActiveUserCount int64     `json:"active_users"`
+	MemberCount     int64     `json:"member_count"`
+}

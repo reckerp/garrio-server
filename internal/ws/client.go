@@ -64,6 +64,8 @@ func (c *Client) ReadFromClient(hub *Hub) {
 const (
 	DISPLAYABLE_SYSTEM_MESSAGE = 1
 	INTERNAL_SYSTEM_MESSAGE    = 2
+	ROOM_UPDATE_MESSAGE        = 3
+	USER_JOIN_LEAVE_MESSAGE    = 51
 	USER_MESSAGE               = 99
 )
 

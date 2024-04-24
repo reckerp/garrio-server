@@ -108,6 +108,15 @@ func (s *RoomService) IsUserMemberOfRoom(c context.Context, userID *uuid.UUID, r
 
 }
 
+func (s *RoomService) RoomMemberCountByRoomID(c context.Context, roomID *uuid.UUID) (int64, error) {
+	count, err := s.db.RoomMemberCountByRoomID(c, *roomID)
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+	return count, nil
+}
+
 func generateInviteToken(length int8) string {
 	bytes := make([]byte, length)
 	_, err := rand.Read(bytes)
